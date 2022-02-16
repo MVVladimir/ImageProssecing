@@ -1,8 +1,8 @@
 ## Работа 2. Исследование каналов и JPEG-сжатия
 автор: Полевой Д.В.
-дата: 2022-02-07T12:30:46
+дата: 2022-02-14T15:09:09
 
-<!-- url: https://gitlab.com/2021-misis-spring/polevoy_d_v/-/tree/master/prj.labs/lab02 -->
+<!-- url: https://github.com/MVVladimir/ImageProssecing\build.vs.2019\prj.labs\lab02 -->
 
 ### Задание
 1. В качестве тестового использовать изображение data/cross_0256x0256.png
@@ -35,5 +35,12 @@
 #include <opencv2/opencv.hpp>
 
 int main() {
+    std::string filename = "C:\Temp\polevoy_d_v\data\cross_0256x0256.png";
+
+    cv::Mat cv::imread(const String & filename,
+        int 	flags = IMREAD_COLOR
+    );
+
+    
 }
 ```

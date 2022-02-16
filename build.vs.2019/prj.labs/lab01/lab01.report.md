@@ -1,8 +1,8 @@
 ## Работа 1. Исследование гамма-коррекции
-автор: Машуров В. В.
-дата: 2022-02-07T12:30:46
+автор: Машуров В.В.
+дата: 2022-02-14T15:09:09
 
-<!-- url: https://github.com/MVVladimir/ImageProssecing\build.vs.2019\prj.labs\lab01 -->
+<!-- url:https://github.com/MVVladimir/ImageProssecing\build.vs.2019\prj.labs\lab01 -->
 
 ### Задание
 1. Сгенерировать серое тестовое изображение $I_1$ в виде прямоугольника размером 768х60 пикселя с плавным изменение пикселей от черного к белому, одна градация серого занимает 3 пикселя по горизонтали.
@@ -15,12 +15,6 @@
 
 ![](lab01.png)
 Рис. 1. Результаты работы программы (сверху вниз $I_1$, $G_1$, $G_2$)
-
-### Время выполнения
-
- gamma-correction cv using open cv method: 4.3725 ms
-
- gamma-correction cv using for pixel by pixel cicle: 7.4978 ms
 
 ### Текст программы
 
@@ -84,3 +78,4 @@ int main() {
   cv::imwrite("G_2.png", G_2);
   cv::imwrite("lab01.png", out);
 }
+
