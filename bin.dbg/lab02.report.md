@@ -1,10 +1,14 @@
 ## Работа 2. Исследование каналов и JPEG-сжатия
-автор: Машуров В. В.
-дата: 2022-02-14T15:09:09
 
-url: https://github.com/MVVladimir/ImageProssecing
+автор: Машуров В. В.
+дата: 2022-02-21T18:07:12
+
+url: [GitHub - MVVladimir/mashurov_v_v](https://github.com/MVVladimir/mashurov_v_v.git)
+
+<!-- url: https://github.com/MVVladimir/ImageProssecing\build.vs.2019\prj.labs\lab02 -->
 
 ### Задание
+
 1. В качестве тестового использовать изображение data/cross_0256x0256.png
 2. Сохранить тестовое изображение в формате JPEG с качеством 25%.
 3. Используя cv::merge и cv::split сделать "мозаику" с визуализацией каналов для исходного тестового изображения и JPEG-версии тестового изображения
@@ -17,7 +21,7 @@ url: https://github.com/MVVladimir/ImageProssecing
 
 ### Результаты
 
-![](cross_0256x0256_0256.jpg)
+![](cross_0256x0256_025.jpg)
 Рис. 1. Тестовое изображение после сохранения в формате JPEG с качеством 25%
 
 ![](cross_0256x0256_png_channels.png)
@@ -27,7 +31,7 @@ url: https://github.com/MVVladimir/ImageProssecing
 Рис. 3. Визуализация каналов JPEG-версии тестового изображения
 
 ![](cross_0256x0256_hists.png)
-Рис. 3. Визуализация гистограмм исходного и JPEG-версии тестового изображения (слева - jpg, справа - png).
+Рис. 3. Визуализация гистограм исходного и JPEG-версии тестового изображения
 
 ### Текст программы
 
@@ -97,9 +101,11 @@ int main() {
     cv::Mat img_png = cv::imread(filename, cv::IMREAD_COLOR);
 
     std::vector<int> compression_params;
-    compression_params.push_back(75);
+    compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
+    compression_params.push_back(25);
 
-    imwrite("./cross_0256x0256_0256.jpg", img_png, compression_params); // Save as jpg with 75 persents loss
+    //PICTURE_1
+    imwrite("./cross_0256x0256_025.jpg", img_png, compression_params); // Save as jpg with 75 persents loss
 
     //==========================CALCULATING=AND=MERGING=CHANNELS===============================
 
@@ -126,7 +132,9 @@ int main() {
     cv::hconcat(bottom, bottomPic);
     cv::vconcat(upperPic, bottomPic, img_channels);
 
+    //PICTURE_2
     imwrite("./cross_0256x0256_png_channels.png", img_channels);
+    //PICTURE_3
     imwrite("./cross_0256x0256_jpg_channels.png", img_channels);
 
     //======================CALCULATING=HISTOGRAMS=================================================
@@ -180,8 +188,9 @@ int main() {
     cv::merge(vizHist_jpg_levels, vizHist_jpg);
     cv::merge(vizHist_png_levels, vizHist_png);
 
-    cv::hconcat(std::vector<cv::Mat> { vizHist_jpg, vizHist_png }, vizHist);
+    cv::hconcat(std::vector<cv::Mat> { vizHist_png, vizHist_jpg }, vizHist);
 
+    //PICTURE_4
     imwrite("./cross_0256x0256_hists.png", vizHist);
 }
 ```

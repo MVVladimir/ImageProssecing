@@ -63,9 +63,11 @@ int main() {
     cv::Mat img_png = cv::imread(filename, cv::IMREAD_COLOR);
 
     std::vector<int> compression_params;
-    compression_params.push_back(75);
+    compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
+    compression_params.push_back(25);
 
-    imwrite("./cross_0256x0256_0256.jpg", img_png, compression_params); // Save as jpg with 75 persents loss
+    //PICTURE_1
+    imwrite("./cross_0256x0256_025.jpg", img_png, compression_params); // Save as jpg with 75 persents loss
 
     //==========================CALCULATING=AND=MERGING=CHANNELS===============================
 
@@ -92,7 +94,9 @@ int main() {
     cv::hconcat(bottom, bottomPic);
     cv::vconcat(upperPic, bottomPic, img_channels);
 
+    //PICTURE_2
     imwrite("./cross_0256x0256_png_channels.png", img_channels);
+    //PICTURE_3
     imwrite("./cross_0256x0256_jpg_channels.png", img_channels);
 
     //======================CALCULATING=HISTOGRAMS=================================================
@@ -146,7 +150,8 @@ int main() {
     cv::merge(vizHist_jpg_levels, vizHist_jpg);
     cv::merge(vizHist_png_levels, vizHist_png);
 
-    cv::hconcat(std::vector<cv::Mat> { vizHist_jpg, vizHist_png }, vizHist);
+    cv::hconcat(std::vector<cv::Mat> { vizHist_png, vizHist_jpg }, vizHist);
 
+    //PICTURE_4
     imwrite("./cross_0256x0256_hists.png", vizHist);
 }

@@ -1,10 +1,14 @@
 ## Работа 2. Исследование каналов и JPEG-сжатия
-автор: Полевой Д.В.
+
+автор: Машуров В. В.
 дата: @time_stemp@
+
+url: [GitHub - MVVladimir/mashurov_v_v](https://github.com/MVVladimir/mashurov_v_v.git)
 
 <!-- url: https://github.com/MVVladimir/ImageProssecing\build.vs.2019\prj.labs\lab02 -->
 
 ### Задание
+
 1. В качестве тестового использовать изображение data/cross_0256x0256.png
 2. Сохранить тестовое изображение в формате JPEG с качеством 25%.
 3. Используя cv::merge и cv::split сделать "мозаику" с визуализацией каналов для исходного тестового изображения и JPEG-версии тестового изображения
