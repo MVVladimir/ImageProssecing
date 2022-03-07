@@ -182,6 +182,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{B89CE7A7-179F-34B9-AF6D-2C134DA97EC5}</Project>
       <Name>lab03</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Temp\mashurov_v_v\build.vs.2019\prj.labs\lab04\lab04.vcxproj">
+      <Project>{D3FB07E8-5149-3EE8-A7AC-5A1A158C18D1}</Project>
+      <Name>lab04</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
