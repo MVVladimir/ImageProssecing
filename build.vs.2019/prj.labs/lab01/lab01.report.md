@@ -1,7 +1,7 @@
 ## Работа 1. Исследование гамма-коррекции
 
 автор: Машуров В.В.
-дата: 2022-02-27T00:07:33
+дата: 2022-03-07T11:44:58
 
 url: [GitHub - MVVladimir/mashurov_v_v](https://github.com/MVVladimir/mashurov_v_v.git)
 

@@ -14,7 +14,7 @@ int main() {
 
     //========================VISUALIZING=THE=FUNCTION========================
 
-    cv::Mat viz_func(522, 522, CV_8UC1);
+    cv::Mat viz_func(512, 512, CV_8UC1);
     viz_func = 255;
 
     std::vector<uint8_t> lut256(256);
@@ -24,18 +24,10 @@ int main() {
         lut256[i] = std::ceil(f(i));
     }
 
-    for (std::ptrdiff_t i = 0; i < viz_func.cols - 10; i += 1)
+    for (std::ptrdiff_t i = 0; i < viz_func.cols; i += 1)
     {
         std::cout << viz_func.rows - f(i) << '\n';
-        viz_func.at<uint8_t>((viz_func.rows - 1 - f(i) * 1.783) - 9, i + 10) = 0;
-    }
-
-    for (std::ptrdiff_t i = 0; i < viz_func.rows; i += 1) {
-        viz_func.at<uint8_t>(i, 10) = 0;
-    }
-
-    for (std::ptrdiff_t i = 0; i < viz_func.cols; i += 1) {
-        viz_func.at<uint8_t>(512, i) = 0;
+        viz_func.at<uint8_t>(viz_func.rows - 1 - f(i) * 1.783, i) = 0;
     }
 
     imwrite("lab03_viz_func.png", viz_func);

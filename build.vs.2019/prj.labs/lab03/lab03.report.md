@@ -1,6 +1,6 @@
 ## Работа 3. Яркостные преобразования
 автор: Машуров В.В.
-дата: 2022-02-27T00:07:33
+дата: 2022-03-07T11:44:58
 
 url: [GitHub - MVVladimir/mashurov_v_v](https://github.com/MVVladimir/mashurov_v_v.git)
 
@@ -15,18 +15,23 @@ url: [GitHub - MVVladimir/mashurov_v_v](https://github.com/MVVladimir/mashurov_v
 ### Результаты
 
 ![](lab03_rgb.png)
+
 Рис. 1. Исходное тестовое изображение
 
 ![](lab03_gre.png)
+
 Рис. 2. Тестовое изображение greyscale
 
 ![](lab03_gre_res.png)
+
 Рис. 3. Результат применения функции преобразования яркости для greyscale
 
 ![](lab03_rgb_res.png)
+
 Рис. 4. Результат применения функции преобразования яркости для каналов
 
 ![](lab03_viz_func.png)
+
 Рис. 5. Визуализация функции яркостного преобразования
 
 ### Текст программы
@@ -48,7 +53,7 @@ int main() {
 
     //========================VISUALIZING=THE=FUNCTION========================
 
-    cv::Mat viz_func(512, 512, CV_8UC1);
+    cv::Mat viz_func(522, 522, CV_8UC1);
     viz_func = 255;
 
     std::vector<uint8_t> lut256(256);
@@ -58,10 +63,18 @@ int main() {
         lut256[i] = std::ceil(f(i));
     }
 
-    for (std::ptrdiff_t i = 0; i < viz_func.cols; i += 1)
+    for (std::ptrdiff_t i = 0; i < viz_func.cols - 10; i += 1)
     {
         std::cout << viz_func.rows - f(i) << '\n';
-        viz_func.at<uint8_t>(viz_func.rows - 1 - f(i) * 1.783, i) = 0;
+        viz_func.at<uint8_t>((viz_func.rows - 1 - f(i) * 1.783) - 9, i + 10) = 0;
+    }
+
+    for (std::ptrdiff_t i = 0; i < viz_func.rows; i += 1) {
+        viz_func.at<uint8_t>(i, 10) = 0;
+    }
+
+    for (std::ptrdiff_t i = 0; i < viz_func.cols; i += 1) {
+        viz_func.at<uint8_t>(512, i) = 0;
     }
 
     imwrite("lab03_viz_func.png", viz_func);
