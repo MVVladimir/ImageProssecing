@@ -22,7 +22,7 @@ cv::Mat morphology(const cv::Mat img) {
     cv::Mat morph;
     cv::morphologyEx(img, morph, cv::MORPH_OPEN, getStructuringElement(cv::MORPH_RECT, cv::Size(50, 50)));
     cv::dilate(img, morph, getStructuringElement(cv::MORPH_RECT, cv::Size(25, 25)));
-    cv::morphologyEx(img, morph, cv::MORPH_CLOSE, getStructuringElement(cv::MORPH_RECT, cv::Size(50, 50)));
+    cv::morphologyEx(img, morph, cv::MORPH_CLOSE, getStructuringElement(cv::MORPH_RECT, cv::Size(100, 100)));
     return morph;
 }
 
@@ -32,8 +32,9 @@ void imageProcessing(cv::Mat img_png, const std::string SAVEPATH) {
     cv::Mat morph = morphology(binarized);
 
     cv::Mat labeled;
+    cv::Mat stat, centroids;
 
-    cv::connectedComponents(morph, labeled);
+    cv::connectedComponentsWithStats(morph, labeled, stat, centroids);
 
     logs += SAVEPATH + "img_bgr.png" + '\n';
 
@@ -44,7 +45,7 @@ void imageProcessing(cv::Mat img_png, const std::string SAVEPATH) {
     imwrite(SAVEPATH + "labeled.png", labeled);
 }
 
-// Sorry, I know it's a bad manner but I don't want to look up docs for this...
+// Sorry, I know it's a bad manner but I don't want to look up for docs for this...
 std::vector<char> chars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 char charIt(int number) {
     return chars.at(number);
