@@ -30,11 +30,37 @@ void imageProcessing(cv::Mat img_png, const std::string SAVEPATH) {
     cv::Mat img_grey = bgrToGrayscale(img_png);
     cv::Mat binarized = binarize(img_grey);
     cv::Mat morph = morphology(binarized);
+    cv::Mat mask = cv::imread(SAVEPATH + "mask.png", cv::IMREAD_GRAYSCALE);
 
     cv::Mat labeled;
     cv::Mat stat, centroids;
+    cv::Mat diff = img_png.clone();
+    diff = 0;
 
     cv::connectedComponentsWithStats(morph, labeled, stat, centroids);
+
+    for (size_t i = 0; i < morph.rows; i += 1)
+    {
+        for (size_t j = 0; j < morph.cols; j += 1)
+        {
+            if ((mask.at<uint8_t>(i, j) > 0) && (morph.at<uint8_t>(i, j) > 0))
+            { //RIGHT WHITE SPACE
+                diff.at<cv::Vec3b>(i, j) = cv::Vec3b(255, 255, 255); //WHITE
+            }
+            if ((mask.at<uint8_t>(i, j) == 0) && (morph.at<uint8_t>(i, j) == 0))
+            { //RIGHT BLACK SPACE
+                diff.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 0, 0); //BLACK
+            }
+            if ((mask.at<uint8_t>(i, j) == 0) && (morph.at<uint8_t>(i, j) > 0))
+            { //WRONG WHITE SPACE
+                diff.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 0, 255); //RED
+            }
+            if ((mask.at<uint8_t>(i, j) > 0) && (morph.at<uint8_t>(i, j) == 0))
+            { //WRONG BLACK SPACE
+                diff.at<cv::Vec3b>(i, j) = cv::Vec3b(255, 0, 0); //BLUE
+            }
+        }
+    }
 
     logs += SAVEPATH + "img_bgr.png" + '\n';
 
@@ -43,6 +69,7 @@ void imageProcessing(cv::Mat img_png, const std::string SAVEPATH) {
     imwrite(SAVEPATH + "binarized.png", binarized);
     imwrite(SAVEPATH + "morph.png", morph);
     imwrite(SAVEPATH + "labeled.png", labeled);
+    imwrite(SAVEPATH + "diff.png", diff);
 }
 
 // Sorry, I know it's a bad manner but I don't want to look up for docs for this...

@@ -1,6 +1,6 @@
 ## Работа 3. Яркостные преобразования
 автор: Машуров В.В.
-дата: 2022-03-07T11:50:40
+дата: 2022-03-26T18:29:08
 
 url: [GitHub - MVVladimir/mashurov_v_v](https://github.com/MVVladimir/mashurov_v_v.git)
 
