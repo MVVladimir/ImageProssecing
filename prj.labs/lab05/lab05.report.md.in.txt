@@ -1,0 +1,153 @@
+## Работа 5. Детектирование границ документов на кадрах видео
+автор: Машуров В. В.
+дата: @time_stemp@
+
+### Задание
+0. текст, иллюстрации и подписи отчета придумываем самостоятельно
+1. используем данные из лаб. 4
+2. выделяем границы и находим внешнюю рамку документа
+3. руками изготавливаем векторную разметку (идеальная рамка купюры)
+4. оцениваем качество и анализируем ошибки
+
+### Результаты
+
+<table>
+    <thead>
+        <tr>
+            <td>Номер</td>
+            <td>Исх. картинка</td>
+            <td>Чёрно-белая</td>
+            <td>Края</td>
+            <td>Маска (Эталон)</td>
+            <td>Контуры</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>50р-1</td>
+            <td> <img src="./lab05/video50.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video50.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video50.mp4/1/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video50.mp4/1/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video50.mp4/1/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>50р-2</td>
+            <td> <img src="./lab05/video50.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video50.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video50.mp4/2/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video50.mp4/2/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video50.mp4/2/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>50р-3</td>
+            <td> <img src="./lab05/video50.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video50.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video50.mp4/3/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video50.mp4/3/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video50.mp4/3/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>100р-1</td>
+            <td> <img src="./lab05/video100.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video100.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video100.mp4/1/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video100.mp4/1/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video100.mp4/1/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>100р-2</td>
+            <td> <img src="./lab05/video100.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video100.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video100.mp4/2/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video100.mp4/2/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video100.mp4/2/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>100р-3</td>
+            <td> <img src="./lab05/video100.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video100.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video100.mp4/3/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video100.mp4/3/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video100.mp4/3/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>500р-1</td>
+            <td> <img src="./lab05/video500.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video500.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video500.mp4/1/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video500.mp4/1/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video500.mp4/1/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>500р-2</td>
+            <td> <img src="./lab05/video500.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video500.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video500.mp4/2/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video500.mp4/2/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video500.mp4/2/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>500р-3</td>
+            <td> <img src="./lab05/video500.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video500.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video500.mp4/3/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video500.mp4/3/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video500.mp4/3/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>1000р-1</td>
+            <td> <img src="./lab05/video1000.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video1000.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video1000.mp4/1/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video1000.mp4/1/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video1000.mp4/1/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>1000р-2</td>
+            <td> <img src="./lab05/video1000.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video1000.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video1000.mp4/2/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video1000.mp4/2/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video1000.mp4/2/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>1000р-3</td>
+            <td> <img src="./lab05/video1000.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video1000.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video1000.mp4/3/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video1000.mp4/3/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video1000.mp4/3/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>5000р-1</td>
+            <td> <img src="./lab05/video5000.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video5000.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video5000.mp4/1/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video5000.mp4/1/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video5000.mp4/1/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>5000р-2</td>
+            <td> <img src="./lab05/video5000.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video5000.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video5000.mp4/2/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video5000.mp4/2/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video5000.mp4/2/contours.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>5000р-3</td>
+            <td> <img src="./lab05/video5000.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video5000.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video5000.mp4/3/eddetect.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video5000.mp4/3/mask.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab05/video5000.mp4/3/contours.png" width = 100px height = 177px> </td>
+        </tr>
+    </tbody>
+</table>
+
+### Текст программы
+
+```cpp
+@cpp_source@
+```

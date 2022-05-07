@@ -1,8 +1,8 @@
-## Работа 4. Детектирование границ документов на кадрах видео
-автор: Полевой Д.В.
+# Работа 4. Детектирование границ документов на кадрах видео
+автор: Машуров В.В.
 дата: @time_stemp@
 
-### Задание
+## Задание
 0. текст, иллюстрации и подписи отчета придумываем самостоятельно
 1. самостоятельно снимаем видео смартфоном
 - объект съемки - купюры (рубли разного номинала), расправленные и лежащие на поверхности (проективно искаженны прямоугольник)
@@ -17,9 +17,192 @@
 7. руками изготавливаем маски (идеальная зона купюры)
 8. оцениваем качество выделение зоны и анализируем ошибки
 
-### Результаты
+## Проделанная работа
 
-### Текст программы
+Разработан алгоритм детектирования границ документов на кадрах видео.
+
+0. Пути к видеороликам сохраняются в векторе. Далее видеоролики последовательно обрабатываются в специальной функции.
+1. Функция, обрабатывающая переданный в неё видеоролик, передаёт кадры в функцию, обрабатывающую отдельные картинки.
+2. Функция, обрабатывающая отдельные картинки, делает следующее:
+- Производит чёрно-белое изображение, с помощью
+```cpp
+cv::cvtColor(<цветное изображение>, <чёрно-белое изображение>, cv::COLOR_BGR2GRAY);
+ ```
+- Бинаризует чёрно-белое изображение, с помощью 
+```cpp 
+cv::adaptiveThreshold(<чёрно-белое изображение>, <бинаризованное изображение>, 256.0, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY_INV, 201, 25.0);
+```
+- Производит морфологию бинаризованного изображения, с помощью: 
+```cpp
+    cv::morphologyEx(<бинаризованное изображение>, <морфологически обработанное изображение>, cv::MORPH_CLOSE, getStructuringElement(cv::MORPH_RECT, cv::Size(100, 100)));
+```
+3. Все созданные изображения и их сравнения переносятся в соответствующие директории. Для эксперимента из 5 видеороликов берётся по 3 кадра. Полученные маски сравниваются с "эталонными", в таблице ниже в колонке "сравнение":
+- белый -- совпадение границ документа.
+- чёрный -- совпадение фона изображения.
+- красный -- неверно детектированные границы документа.
+- синий - неверно детектированный фон документа.
+
+## Исходные данные
+
+<table>
+    <thead>
+        <tr>
+            <td>Номер</td>
+            <td>Исх. картинка</td>
+            <td>Чёрно-белая</td>
+            <td>Бинар.</td>
+            <td>Морфология</td>
+            <td>Сравнение</td>
+            <td>Маска (Эталон)</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>50р-1</td>
+            <td> <img src="./lab04/video50.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/1/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/1/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/1/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video50.mp4/1/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>50р-2</td>
+            <td> <img src="./lab04/video50.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/2/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/2/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/2/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video50.mp4/2/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>50р-3</td>
+            <td> <img src="./lab04/video50.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/3/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/3/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video50.mp4/3/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video50.mp4/3/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>100р-1</td>
+            <td> <img src="./lab04/video100.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/1/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/1/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/1/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video100.mp4/1/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>100р-2</td>
+            <td> <img src="./lab04/video100.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/2/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/2/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/2/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video100.mp4/2/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>100р-3</td>
+            <td> <img src="./lab04/video100.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/3/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/3/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video100.mp4/3/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video100.mp4/3/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>500р-1</td>
+            <td> <img src="./lab04/video500.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/1/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/1/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/1/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video500.mp4/1/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>500р-2</td>
+            <td> <img src="./lab04/video500.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/2/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/2/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/2/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video500.mp4/2/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>500р-3</td>
+            <td> <img src="./lab04/video500.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/3/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/3/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video500.mp4/3/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video500.mp4/3/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>1000р-1</td>
+            <td> <img src="./lab04/video1000.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/1/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/1/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/1/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video1000.mp4/1/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>1000р-2</td>
+            <td> <img src="./lab04/video1000.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/2/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/2/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/2/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video1000.mp4/2/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>1000р-3</td>
+            <td> <img src="./lab04/video1000.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/3/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/3/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video1000.mp4/3/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video1000.mp4/3/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>5000р-1</td>
+            <td> <img src="./lab04/video5000.mp4/1/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/1/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/1/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/1/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/1/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video5000.mp4/1/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>5000р-2</td>
+            <td> <img src="./lab04/video5000.mp4/2/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/2/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/2/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/2/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/2/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video5000.mp4/2/mask.png" width = 100px height = 177px> </td>
+        </tr>
+        <tr>
+            <td>5000р-3</td>
+            <td> <img src="./lab04/video5000.mp4/3/img_bgr.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/3/img_grey.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/3/binarized.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/3/morph.png" width = 100px height = 177px> </td>
+            <td> <img src="./lab04/video5000.mp4/3/diff.png" width = 100px height = 177px> </td>
+            <td> <img src="../data/masks/video5000.mp4/3/mask.png" width = 100px height = 177px> </td>
+        </tr>
+    </tbody>
+</table>
+
+5 видеороликов, находятся в "./data/video<50, 100, 500, 1000, 5000>.mp4". Из каждого программа достала по три кадра и обработала по алгоритму.
+
+## Результаты
+
+Алгоритм предсказывает маску с точностью = 0.62962. Точность вычисляется по формуле правильно_предсказанные_точки_на_всех_картинках / суммарное_количество_точек_на_картинках.
+Из сравнений видно, что на однородном документ, противоположного цвета и яркости, лучше детектируется алгоритмом.
+
+## Текст программы
 
 ```cpp
 @cpp_source@
