@@ -1,6 +1,7 @@
 project(lab05)
 add_executable(lab05 lab05.cpp lab05.report.md.in.txt)
 target_link_libraries(lab05 ${OpenCV_LIBS})
+target_link_libraries(lab05 nlohmann_json::nlohmann_json)
 
 file(READ lab05.cpp cpp_source)
 # prepare report md file

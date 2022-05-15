@@ -1,9 +1,33 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <cmath>
+#include <nlohmann/json.hpp>
+#include <fstream>
+#include <limits>
 
 std::string logs = "";
 unsigned long long int rightOnes = 0;
+
+std::vector<cv::Point2f> getPointsFromJson(std::string& filePath, const std::string& topTag) {
+    std::ifstream inputJSON(filePath);
+    nlohmann::json json;
+    inputJSON >> json;
+
+    std::map<char, std::vector<int>> mapXY;
+    mapXY['x'] = json[topTag]["regions"][0]["shape_attributes"]["all_points_x"].get<std::vector<int>>();
+    mapXY['y'] = json[topTag]["regions"][0]["shape_attributes"]["all_points_y"].get<std::vector<int>>();
+
+    inputJSON.close();
+
+    std::vector<cv::Point2f> output;
+
+    for (size_t i = 0; i < mapXY['x'].size(); i += 1)
+    {
+        output.push_back(cv::Point2f(mapXY['x'].at(i), mapXY['y'].at(i)));
+    }
+
+    return output;
+}
 
 cv::Mat bgrToGrayscale(const cv::Mat& img_bgr) {
     cv::Mat img_grey;
@@ -45,17 +69,83 @@ cv::Mat findRightContours(const cv::Mat& eddetect) {
     return res;
 }
 
+std::vector<cv::Point2f> findCorners(cv::Mat& img) {
+    int maxCorners = 4;
+    std::vector<cv::Point2f> corners;
+    double qualityLevel = 0.01;
+    double minDistance = 10;
+    int blockSize = 3, gradientSize = 3;
+    bool useHarrisDetector = false;
+    double k = 0.04;
+
+    goodFeaturesToTrack(img,
+        corners,
+        maxCorners,
+        qualityLevel,
+        minDistance,
+        cv::Mat(),
+        blockSize,
+        gradientSize,
+        useHarrisDetector,
+        k);
+
+    return corners;
+}
+
+double euclidean_metric(cv::Point2f p1, cv::Point2f p2) {
+    return std::sqrt(std::pow(p1.x - p2.x, 2.) + std::pow(p1.y - p2.y, 2.));
+}
+
+double find_distance_from_nearest_point(std::vector<cv::Point2f> points, cv::Point2f myPoint) {
+    double min = std::numeric_limits<double>::max();
+    for (auto point : points) {
+        if (euclidean_metric(point, myPoint) < min) {
+            min = euclidean_metric(point, myPoint);
+        }
+    }
+    return min;
+}
+
+double find_perimetr(std::vector<cv::Point2f> points) {
+    double P = 0.;
+    for (size_t i = 0; i < points.size() - 1; i += 1)
+    {
+        P += euclidean_metric(points[i], points[i + 1]);
+    }
+    P += euclidean_metric(points[points.size() - 1], points[0]);
+    return P;
+}
+
 void imageProcessing(cv::Mat img_png, const std::string SAVEPATH, const std::string SOURCESPATH) {
     cv::Mat img_grey = bgrToGrayscale(img_png);
     cv::Mat eddetect = edDetect(img_grey);
     cv::Mat contours = findRightContours(eddetect);
 
-    logs += SAVEPATH + "img_bgr.png" + '\n';
+    cv::Mat contours_gray(contours.size(), CV_8UC1);
+    cv::cvtColor(contours, contours_gray, cv::COLOR_BGR2GRAY);
+
+    std::vector<cv::Point2f> corners = findCorners(contours_gray);
+    cv::Mat corners_img(contours.size(), CV_8UC3, { 0, 0, 0 });
+
+    std::vector<cv::Point2f> points = getPointsFromJson(SAVEPATH + "ethalon.json", "img_bgr"); 
+    double max_err = -1.;
+
+    for (cv::Point2f corner : corners) {
+        cv::circle(corners_img, corner, 5, { 255, 255, 255 });
+        if (max_err < find_distance_from_nearest_point(points, corner)) {
+            max_err = find_distance_from_nearest_point(points, corner);
+        }
+    }
+
+    double loss = max_err / find_perimetr(points);
+
+    logs += (SAVEPATH + " : loss = " + std::to_string(loss) + '\n');
 
     imwrite(SAVEPATH + "img_bgr.png", img_png);
     imwrite(SAVEPATH + "img_grey.png", img_grey);
     imwrite(SAVEPATH + "eddetect.png", eddetect);
     imwrite(SAVEPATH + "contours.png", contours);
+    imwrite(SAVEPATH + "corners.png", corners_img);
 }
 
 // Sorry, I know it's a bad manner but I don't want to look up for docs for this...
@@ -92,9 +182,6 @@ int main() {
         std::cout << logs;
         logs.clear();
     }
-
-    std::cout << "\nACCURACY = " << rightOnes << " / " << files.size() * 1280 * 720 * 3
-        << " = " << ((double)rightOnes / (double)(files.size() * 1280 * 720 * 3)) << '\n' << std::endl;
 
     return 0;
 }

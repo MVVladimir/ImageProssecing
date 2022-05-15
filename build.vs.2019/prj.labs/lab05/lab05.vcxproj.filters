@@ -9,6 +9,9 @@
     <CustomBuild Include="C:\Temp\mashurov_v_v\prj.labs\lab05\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Natvis Include="C:\Temp\mashurov_v_v\dependencies\json\nlohmann_json.natvis" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="C:\Temp\mashurov_v_v\prj.labs\lab05\lab05.report.md.in.txt" />
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 ## Работа 2. Исследование каналов и JPEG-сжатия
 
 автор: Машуров В. В.
-дата: 2022-04-18T14:08:55
+дата: 2022-05-16T02:23:21
 
 url: [GitHub - MVVladimir/mashurov_v_v](https://github.com/MVVladimir/mashurov_v_v.git)
 
