@@ -190,6 +190,14 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{8782A953-C1D2-3AD5-A91D-A9DA465D2387}</Project>
       <Name>lab05</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Temp\mashurov_v_v\build.vs.2019\prj.labs\lab06\lab06.vcxproj">
+      <Project>{A8AC4C06-39F5-327D-8BE2-B16EBA412385}</Project>
+      <Name>lab06</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Temp\mashurov_v_v\build.vs.2019\prj.labs\taskK\taskK.vcxproj">
+      <Project>{540BC0F9-997E-35A8-8A9C-C58202F6E642}</Project>
+      <Name>taskK</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

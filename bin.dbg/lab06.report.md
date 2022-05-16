@@ -1,145 +1,17 @@
-# Работа 5. Детектирование границ документов на кадрах видео
+# Работа 6. Анализ цвета в задаче детектирования документов
 автор: Машуров В. В.
 дата: 2022-05-16T11:51:36
 
 github: https://github.com/MVVladimir/mashurov_v_v 
 
 # Задание
-0. текст, иллюстрации и подписи отчета придумываем самостоятельно
-1. используем данные из лаб. 4
-2. выделяем границы и находим внешнюю рамку документа
-3. руками изготавливаем векторную разметку (идеальная рамка купюры)
-4. оцениваем качество и анализируем ошибки
+1. Реализуйте в виде программы задание 6-й работы (lab06.report.md.in.txt), исходное изображение выбрать одно из архива (Файлы-Учебные материалы).
+2. С помощью реализованной программы сгенерируйте изображения для отчета.
+3. Допишите ваш отчет по образцу шаблона.
+4. Сконвертируйте markdown файл отчета в pdf-отчет с именем вида "Фамилия_Имя_lab06_БПМ_XX_Y.pdf". Обратите внимание на то, что Фамилия_Имя с заглавной буквы, а разделители подчеркивания.
+5. Отчитайтесь о выполнении задания, прикрепив pdf-отчет.
 
 # Результаты
-
-Введём функцию потерь для оценки качества детектора. 
-- $loss$ - функция потерь. 
-- $max\_err$ - максимальный "промах" детектирования одной вершины границы. 
-- $P_A$ - периметр эталона границы документа.
-
-Выходит следующа формула:
-
-$loss = max\_err / P_A$
-
-Ниже приведён список получившихся значений $loss$ для каждого случая:
-
-./lab05/video50.mp4/1/ : loss = 0.323254
-
-./lab05/video50.mp4/2/ : loss = 0.232544
-
-./lab05/video50.mp4/3/ : loss = 0.189540
-
-./lab05/video100.mp4/1/ : loss = 0.186052
-
-./lab05/video100.mp4/2/ : loss = 0.204909
-
-./lab05/video100.mp4/3/ : loss = 0.272846
-
-./lab05/video500.mp4/1/ : loss = 0.346661
-
-./lab05/video500.mp4/2/ : loss = 0.234558
-
-./lab05/video500.mp4/3/ : loss = 0.336680
-
-./lab05/video1000.mp4/1/ : loss = 0.208826
-
-./lab05/video1000.mp4/2/ : loss = 0.260215
-
-./lab05/video1000.mp4/3/ : loss = 0.193193
-
-./lab05/video5000.mp4/1/ : loss = 0.210816
-
-./lab05/video5000.mp4/2/ : loss = 0.200076
-
-./lab05/video5000.mp4/3/ : loss = 0.160696
-
-## Этапы программы
-
-### 1 Этап - производим сжатие, размытие и цветоредукцию
-
-```cpp
-cv::Mat bgrToGrayscale(const cv::Mat& img_bgr) {
-    cv::Mat img_grey;
-    cv::resize(img_bgr, img_grey, cv::Size(img_bgr.cols / 2, img_bgr.rows / 2), 0.5, 0.5);
-    cv::GaussianBlur(img_grey, img_grey, cv::Size(5, 5), 1.);
-    cv::blur(img_grey, img_grey, cv::Size(3, 3));
-    cv::cvtColor(img_grey, img_grey, cv::COLOR_BGR2GRAY);
-    return img_grey;
-}
-```
-
-### 2 Этап - распознаём все границы с помощью детектора Кенни 
-
-```cpp
-cv::Mat edDetect(const cv::Mat& img_grey) {
-    cv::Mat eddetect;
-    cv::Canny(img_grey, eddetect, 100., 200.);
-    return eddetect;
-}
-```
-
-### 3 Этап - находим нужные нам границы
-
-Используется метод поиска прямоугольника максимальной площади. Метод не универсален.
-
-```cpp
-cv::Mat findRightContours(const cv::Mat& eddetect) {
-    cv::Mat res = cv::Mat::zeros(eddetect.rows, eddetect.cols, CV_8UC3);
-    std::vector<std::vector<cv::Point> > contours;
-    std::vector<cv::Vec4i> hierarchy;
-
-    cv::findContours(eddetect, contours, hierarchy,
-        cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-    int idx = 0;
-    int the_biggest_rec_idx = 0;
-    double area = 0.;
-    for (; idx >= 0; idx = hierarchy[idx][0])
-    {
-        if (cv::contourArea(contours[idx]) > area) {
-            area = cv::contourArea(contours[idx]);
-            the_biggest_rec_idx = idx;
-        }
-    }
-
-    cv::Scalar color(rand() & 255, rand() & 255, rand() & 255);
-    cv::drawContours(res, contours, the_biggest_rec_idx, color, cv::LINE_4, 8, hierarchy);
-
-    return res;
-}
-```
-
-### 4 Этап - находим углы для оценки детектирования методом Shi-Tomasi
-
-```cpp
-    std::vector<cv::Point2f> findCorners(cv::Mat& img) {
-    int maxCorners = 4;
-    std::vector<cv::Point2f> corners;
-    double qualityLevel = 0.01;
-    double minDistance = 10;
-    int blockSize = 3, gradientSize = 3;
-    bool useHarrisDetector = false;
-    double k = 0.04;
-
-    goodFeaturesToTrack(img,
-        corners,
-        maxCorners,
-        qualityLevel,
-        minDistance,
-        cv::Mat(),
-        blockSize,
-        gradientSize,
-        useHarrisDetector,
-        k);
-
-    return corners;
-}
-```
-
-### 5 Этап 
-
-Рассчитываем качество детектирования по формуле выше: $loss = max\_err / P_A$.
 
 # Результаты наглядно
 
