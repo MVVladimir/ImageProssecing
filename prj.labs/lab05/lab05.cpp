@@ -137,9 +137,9 @@ void imageProcessing(cv::Mat img_png, const std::string SAVEPATH, const std::str
         }
     }
 
-    double loss = max_err / find_perimetr(points);
+    double penalty = max_err / find_perimetr(points);
 
-    logs += (SAVEPATH + " : loss = " + std::to_string(loss) + '\n');
+    logs += (SAVEPATH + " : penalty = " + std::to_string(penalty) + '\n');
 
     imwrite(SAVEPATH + "img_bgr.png", img_png);
     imwrite(SAVEPATH + "img_grey.png", img_grey);

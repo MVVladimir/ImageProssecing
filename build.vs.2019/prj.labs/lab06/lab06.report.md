@@ -1,19 +1,214 @@
 # Работа 6. Анализ цвета в задаче детектирования документов
 автор: Машуров В. В.
-дата: 2022-05-16T11:51:36
+дата: 2022-05-22T19:49:50
 
 github: https://github.com/MVVladimir/mashurov_v_v 
 
-# Задание
+## Задание
 1. Реализуйте в виде программы задание 6-й работы (lab06.report.md.in.txt), исходное изображение выбрать одно из архива (Файлы-Учебные материалы).
 2. С помощью реализованной программы сгенерируйте изображения для отчета.
 3. Допишите ваш отчет по образцу шаблона.
 4. Сконвертируйте markdown файл отчета в pdf-отчет с именем вида "Фамилия_Имя_lab06_БПМ_XX_Y.pdf". Обратите внимание на то, что Фамилия_Имя с заглавной буквы, а разделители подчеркивания.
 5. Отчитайтесь о выполнении задания, прикрепив pdf-отчет.
 
-# Результаты
+## Выполнение
 
-# Результаты наглядно
+### 1. Производим сжатие изображения. 
+Производим сжатие изображения в два раза со scale_factor = 0.5 по обоим оосям.
+```cpp
+cv::resize(img_full, img_short, cv::Size(img_bgr.cols / 2, img_bgr.rows / 2), 0.5, 0.5);
+```
+
+### 2. Размываем изображение
+Размываем изображение сначала фильтром Гаусса с окном (5, 5) и  Gaussian kernek standart deviation in X direction = 1.0.
+Затем производим размытие уже другим фильтром cv::blur с окном (3, 3).
+```cpp
+cv::GaussianBlur(img, img_, cv::Size(5, 5), 1.);
+cv::blur(img, img, cv::Size(3, 3));
+```
+
+### 3. Производим цветоредукцию
+Можно воспользоваться следующей инструкцией:
+```cpp
+cv::cvtColor(img, img, cv::COLOR_BGR2GRAY);
+```
+
+### 4. Строим карту границ
+Воспользуемся детектором границ Кенни:
+```cpp
+cv::cvtColor(img, edge_map, cv::COLOR_BGR2GRAY);
+```
+
+### 5. Найдём на карте границ нужные
+Для этого будем использовать метод поиска прямоугольника наибольшей площади. Метод не идеален.
+
+Можно воспользоваться следующей инструкцией:
+
+```cpp
+cv::Mat findRightContours(const cv::Mat& eddetect) {
+    cv::Mat res = cv::Mat::zeros(eddetect.rows, eddetect.cols, CV_8UC3);
+    std::vector<std::vector<cv::Point> > contours;
+    std::vector<cv::Vec4i> hierarchy;
+
+    cv::findContours(eddetect, contours, hierarchy,
+        cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    int idx = 0;
+    int the_biggest_rec_idx = 0;
+    double area = 0.;
+    for (; idx >= 0; idx = hierarchy[idx][0])
+    {
+        if (cv::contourArea(contours[idx]) > area) {
+            area = cv::contourArea(contours[idx]);
+            the_biggest_rec_idx = idx;
+        }
+    }
+
+    cv::Scalar color(rand() & 255, rand() & 255, rand() & 255);
+    cv::drawContours(res, contours, the_biggest_rec_idx, color, cv::LINE_4, 8, hierarchy);
+
+    return res;
+}
+```
+Здесь, eddetect - карта границ полученная детектором Кенни.
+
+### 6. Найдём углы документа
+
+Для этого воспользуемся Shi-Tomasi Corner Detector. 
+Для этого можно воспользоваться следующей инструкцией:
+
+```cpp
+std::vector<cv::Point2f> findCorners(cv::Mat& img) {
+    int maxCorners = 4;
+    std::vector<cv::Point2f> corners;
+    double qualityLevel = 0.01;
+    double minDistance = 10;
+    int blockSize = 3, gradientSize = 3;
+    bool useHarrisDetector = false;
+    double k = 0.04;
+
+    goodFeaturesToTrack(img,
+        corners,
+        maxCorners,
+        qualityLevel,
+        minDistance,
+        cv::Mat(),
+        blockSize,
+        gradientSize,
+        useHarrisDetector,
+        k);
+
+    return corners;
+}
+```
+
+Здесь, img - это изображение, прошедшее 5 предыдущих этапов обработки, из которого нам необходимо получить информацию об углах. 
+corners - это вектор точек, которые обозначают углы.
+
+### 7. Сравним полученные результаты с эталонными.
+
+В качестве штрафной функции будем использовать отношение максимальной ошибки опеделения угла к периметру прямоугольника.
+
+#### Значения штрафной функции
+
+<table>
+    <thead>
+        <tr>
+            <td>Файл</td>
+            <td> Значение штрафной функции</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td> "./lab05/video50.mp4/1/" </td>
+            <td> 0.323254 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video50.mp4/2/" </td>
+            <td> 0.232544 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video50.mp4/3/" </td>
+            <td> 0.189540 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video100.mp4/1/" </td>
+            <td> 0.186052 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video100.mp4/2/" </td>
+            <td> 0.204909 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video100.mp4/3/" </td>
+            <td> 0.272846 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video500.mp4/1/" </td>
+            <td> 0.346661</td>
+        </tr>
+        <tr>
+            <td> "./lab05/video500.mp4/2/" </td>
+            <td> 0.234558 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video500.mp4/3/" </td>
+            <td> 0.336680 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video1000.mp4/1/" </td>
+            <td> 0.208826 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video1000.mp4/2/" </td>
+            <td> 0.260215 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video1000.mp4/3/" </td>
+            <td> 0.193193 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video5000.mp4/2/" </td>
+            <td> 0.200076 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video5000.mp4/3/" </td>
+            <td> 0.160696 </td>
+        </tr>
+    <\tbody>
+<\table>
+
+#### Описание результатов
+
+<table>
+    <thead>
+        <tr>
+            <td> Показатель </td>
+            <td> Значение </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td> Среднее </td>
+            <td> 0.237391 </td>
+        </tr>
+        <tr>
+            <td> Среднеквадратическое отклонение </td>
+            <td> 0.058377 </td>
+        </tr>
+        <tr>
+            <td> Минимальное значение штрафной функции </td>
+            <td> 0.160696 </td>
+        </tr>
+        <tr>
+            <td> Максимальное значение штрафной функции </td>
+            <td> 0.346661 </td>
+        </tr>
+    <\tbody>
+<\table>
+           
+
+## Результаты
 
 <table>
     <thead>
@@ -21,9 +216,9 @@ github: https://github.com/MVVladimir/mashurov_v_v
             <td>Номер</td>
             <td>Исх. картинка</td>
             <td>Чёрно-белая</td>
-            <td>Края (Кенни)</td>
-            <td>Края (после отсева ненужных)</td>
-            <td>Найденные границы</td>
+            <td>Карта границ (Кенни)</td>
+            <td>Карта границ (после отсева ненужных)</td>
+            <td>Выходная карта границ /td>
         </tr>
     </thead>
     <tbody>
@@ -150,7 +345,7 @@ github: https://github.com/MVVladimir/mashurov_v_v
     </tbody>
 </table>
 
-# Текст программы
+## Текст программы
 
 ```cpp
 #include <opencv2/opencv.hpp>

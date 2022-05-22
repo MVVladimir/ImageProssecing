@@ -4,84 +4,45 @@
 
 github: https://github.com/MVVladimir/mashurov_v_v 
 
-# Задание
+## Задание
 0. текст, иллюстрации и подписи отчета придумываем самостоятельно
 1. используем данные из лаб. 4
 2. выделяем границы и находим внешнюю рамку документа
 3. руками изготавливаем векторную разметку (идеальная рамка купюры)
 4. оцениваем качество и анализируем ошибки
 
-# Результаты
+## Выполнение
 
-Введём функцию потерь для оценки качества детектора. 
-- $loss$ - функция потерь. 
-- $max\_err$ - максимальный "промах" детектирования одной вершины границы. 
-- $P_A$ - периметр эталона границы документа.
-
-Выходит следующа формула:
-
-$loss = max\_err / P_A$
-
-Ниже приведён список получившихся значений $loss$ для каждого случая:
-
-./lab05/video50.mp4/1/ : loss = 0.323254
-
-./lab05/video50.mp4/2/ : loss = 0.232544
-
-./lab05/video50.mp4/3/ : loss = 0.189540
-
-./lab05/video100.mp4/1/ : loss = 0.186052
-
-./lab05/video100.mp4/2/ : loss = 0.204909
-
-./lab05/video100.mp4/3/ : loss = 0.272846
-
-./lab05/video500.mp4/1/ : loss = 0.346661
-
-./lab05/video500.mp4/2/ : loss = 0.234558
-
-./lab05/video500.mp4/3/ : loss = 0.336680
-
-./lab05/video1000.mp4/1/ : loss = 0.208826
-
-./lab05/video1000.mp4/2/ : loss = 0.260215
-
-./lab05/video1000.mp4/3/ : loss = 0.193193
-
-./lab05/video5000.mp4/1/ : loss = 0.210816
-
-./lab05/video5000.mp4/2/ : loss = 0.200076
-
-./lab05/video5000.mp4/3/ : loss = 0.160696
-
-## Этапы программы
-
-### 1 Этап - производим сжатие, размытие и цветоредукцию
-
+### 1. Производим сжатие изображения. 
+Производим сжатие изображения в два раза со scale_factor = 0.5 по обоим оосям.
 ```cpp
-cv::Mat bgrToGrayscale(const cv::Mat& img_bgr) {
-    cv::Mat img_grey;
-    cv::resize(img_bgr, img_grey, cv::Size(img_bgr.cols / 2, img_bgr.rows / 2), 0.5, 0.5);
-    cv::GaussianBlur(img_grey, img_grey, cv::Size(5, 5), 1.);
-    cv::blur(img_grey, img_grey, cv::Size(3, 3));
-    cv::cvtColor(img_grey, img_grey, cv::COLOR_BGR2GRAY);
-    return img_grey;
-}
+cv::resize(img_full, img_short, cv::Size(img_bgr.cols / 2, img_bgr.rows / 2), 0.5, 0.5);
 ```
 
-### 2 Этап - распознаём все границы с помощью детектора Кенни 
-
+### 2. Размываем изображение
+Размываем изображение сначала фильтром Гаусса с окном (5, 5) и  Gaussian kernel standart deviation in X direction = 1.0.
+Затем производим размытие уже другим фильтром cv::blur с окном (3, 3).
 ```cpp
-cv::Mat edDetect(const cv::Mat& img_grey) {
-    cv::Mat eddetect;
-    cv::Canny(img_grey, eddetect, 100., 200.);
-    return eddetect;
-}
+cv::GaussianBlur(img, img_, cv::Size(5, 5), 1.);
+cv::blur(img, img, cv::Size(3, 3));
 ```
 
-### 3 Этап - находим нужные нам границы
+### 3. Производим цветоредукцию
+Можно воспользоваться следующей инструкцией:
+```cpp
+cv::cvtColor(img, img, cv::COLOR_BGR2GRAY);
+```
 
-Используется метод поиска прямоугольника максимальной площади. Метод не универсален.
+### 4. Строим карту границ
+Воспользуемся детектором границ Кенни:
+```cpp
+cv::cvtColor(img, edge_map, cv::COLOR_BGR2GRAY);
+```
+
+### 5. Найдём на карте границ нужные
+Для этого будем использовать метод поиска прямоугольника наибольшей площади. Метод не идеален.
+
+Можно воспользоваться следующей инструкцией:
 
 ```cpp
 cv::Mat findRightContours(const cv::Mat& eddetect) {
@@ -109,11 +70,15 @@ cv::Mat findRightContours(const cv::Mat& eddetect) {
     return res;
 }
 ```
+Здесь, eddetect - карта границ полученная детектором Кенни.
 
-### 4 Этап - находим углы для оценки детектирования методом Shi-Tomasi
+### 6. Найдём углы документа
+
+Для этого воспользуемся Shi-Tomasi Corner Detector. 
+Для этого можно воспользоваться следующей инструкцией:
 
 ```cpp
-    std::vector<cv::Point2f> findCorners(cv::Mat& img) {
+std::vector<cv::Point2f> findCorners(cv::Mat& img) {
     int maxCorners = 4;
     std::vector<cv::Point2f> corners;
     double qualityLevel = 0.01;
@@ -137,11 +102,113 @@ cv::Mat findRightContours(const cv::Mat& eddetect) {
 }
 ```
 
-### 5 Этап 
+Здесь, img - это изображение, прошедшее 5 предыдущих этапов обработки, из которого нам необходимо получить информацию об углах. 
+corners - это вектор точек, которые обозначают углы.
 
-Рассчитываем качество детектирования по формуле выше: $loss = max\_err / P_A$.
+### 7. Сравним полученные результаты с эталонными.
 
-# Результаты наглядно
+В качестве штрафной функции будем использовать отношение максимальной ошибки опеделения угла к периметру прямоугольника.
+
+#### Значения штрафной функции
+
+<table>
+    <thead>
+        <tr>
+            <td>Файл</td>
+            <td> Значение штрафной функции</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td> "./lab05/video50.mp4/1/" </td>
+            <td> 0.323 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video50.mp4/2/" </td>
+            <td> 0.232 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video50.mp4/3/" </td>
+            <td> 0.189 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video100.mp4/1/" </td>
+            <td> 0.186 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video100.mp4/2/" </td>
+            <td> 0.204 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video100.mp4/3/" </td>
+            <td> 0.272 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video500.mp4/1/" </td>
+            <td> 0.346 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video500.mp4/2/" </td>
+            <td> 0.234 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video500.mp4/3/" </td>
+            <td> 0.336 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video1000.mp4/1/" </td>
+            <td> 0.208 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video1000.mp4/2/" </td>
+            <td> 0.260 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video1000.mp4/3/" </td>
+            <td> 0.193 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video5000.mp4/2/" </td>
+            <td> 0.200 </td>
+        </tr>
+        <tr>
+            <td> "./lab05/video5000.mp4/3/" </td>
+            <td> 0.160 </td>
+        </tr>
+    </tbody>
+</table>
+
+#### Описание результатов
+
+<table>
+    <thead>
+        <tr>
+            <td> Показатель </td>
+            <td> Значение </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td> Среднее </td>
+            <td> 0.237 </td>
+        </tr>
+        <tr>
+            <td> Среднеквадратическое отклонение </td>
+            <td> 0.058 </td>
+        </tr>
+        <tr>
+            <td> Минимальное значение штрафной функции </td>
+            <td> 0.160 </td>
+        </tr>
+        <tr>
+            <td> Максимальное значение штрафной функции </td>
+            <td> 0.346 </td>
+        </tr>
+    </tbody>
+</table>
+           
+
+## Результаты
 
 <table>
     <thead>
@@ -149,9 +216,9 @@ cv::Mat findRightContours(const cv::Mat& eddetect) {
             <td>Номер</td>
             <td>Исх. картинка</td>
             <td>Чёрно-белая</td>
-            <td>Края (Кенни)</td>
-            <td>Края (после отсева ненужных)</td>
-            <td>Найденные границы</td>
+            <td>Карта границ (Кенни)</td>
+            <td>Карта границ (после отсева ненужных)</td>
+            <td>Выходная карта границ /td>
         </tr>
     </thead>
     <tbody>
@@ -278,7 +345,7 @@ cv::Mat findRightContours(const cv::Mat& eddetect) {
     </tbody>
 </table>
 
-# Текст программы
+## Текст программы
 
 ```cpp
 @cpp_source@
